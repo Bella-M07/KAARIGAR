@@ -15,6 +15,7 @@ import {
   SweetsSvg,
   TiffinSvg,
 } from './components/Illustrations';
+import { LandingHero } from './components/LandingHero';
 import { LiveMap } from './components/LiveMap';
 import { nearLabel, OrderModal } from './components/OrderModal';
 import { OnboardModal } from './components/OnboardModal';
@@ -56,7 +57,6 @@ const AHMEDABAD_AREAS: Array<{ name: string; lat: number; lng: number; label: st
 const MARQUEE_WORDS = ['Tiffin', 'Laundry', 'Tailoring', 'Papad', 'Pickle', 'Mehndi', 'Baking'];
 
 export const App: React.FC = () => {
-  const heroRef = useRef<HTMLElement | null>(null);
   const findRef = useRef<HTMLElement | null>(null);
 
   // Authenticated user session
@@ -342,76 +342,17 @@ export const App: React.FC = () => {
         </div>
       </nav>
 
-      <header
-        className="hero"
-        id="top"
-        ref={heroRef}
-        onMouseMove={(e) => {
-          const el = heroRef.current;
-          if (!el) return;
-          const r = el.getBoundingClientRect();
-          el.style.setProperty('--mx', `${((e.clientX - r.left) / r.width - 0.5) * 60}px`);
-          el.style.setProperty('--my', `${((e.clientY - r.top) / r.height - 0.5) * 60}px`);
+      <LandingHero
+        heroInput={heroInput}
+        onChangeHeroInput={setHeroInput}
+        onSelectPlace={(place, svcPrefix) => {
+          setCenter({ lat: place.lat, lng: place.lng, label: place.label });
+          if (svcPrefix) setSearchQuery(svcPrefix);
+          setHeroInput(svcPrefix ? `${svcPrefix} near ${place.label}` : place.label);
+          findRef.current?.scrollIntoView({ behavior: 'smooth' });
         }}
-      >
-        <div
-          className="fl"
-          style={{ ['--d' as any]: 0.6, left: -50, top: -40, width: 250 }}
-        >
-          <SunSvg />
-        </div>
-        <div
-          className="fl"
-          style={{ ['--d' as any]: -0.5, right: -10, top: 10, width: 150, animationDelay: '-2s' }}
-        >
-          <RoseSvg />
-        </div>
-        <div
-          className="fl"
-          style={{ ['--d' as any]: 0.4, left: '3%', bottom: -6, width: 150, animationDelay: '-1s' }}
-        >
-          <StrawSvg />
-        </div>
-        <div
-          className="fl"
-          style={{ ['--d' as any]: -0.7, right: '2%', bottom: -10, width: 140, animationDelay: '-3s' }}
-        >
-          <StrawSvg />
-        </div>
-        <div className="bfly">
-          <ButterflySvg a="#8FA8F0" b="#F5A21A" />
-        </div>
-        <div className="bfly" style={{ animationDelay: '-8s', width: 52 }}>
-          <ButterflySvg a="#F5A21A" b="#D63F9B" />
-        </div>
-
-        <div className="badge">
-          <h1>Ghar ka hunar, aapke mohalle mein.</h1>
-          <p>
-            Tiffin, laundry, papad, tailoring and more, made by women in your neighbourhood. Find
-            the nearest kaarigar and order in minutes.
-          </p>
-          <div className="search" style={{ overflow: 'visible' }}>
-            <PlaceAutocomplete
-              value={heroInput}
-              onChange={setHeroInput}
-              allowNearSyntax
-              ariaLabel="Search service or area"
-              placeholder="Tiffin near Shyamal, Ahmedabad"
-              onSelectPlace={(place, svcPrefix) => {
-                setCenter({ lat: place.lat, lng: place.lng, label: place.label });
-                if (svcPrefix) setSearchQuery(svcPrefix);
-                setHeroInput(svcPrefix ? `${svcPrefix} near ${place.label}` : place.label);
-                findRef.current?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              onSubmit={handleHeroSearch}
-            />
-            <button type="button" className="btn alt" onClick={handleHeroSearch}>
-              Search
-            </button>
-          </div>
-        </div>
-      </header>
+        onSubmitSearch={handleHeroSearch}
+      />
 
       <div className="mq" aria-hidden="true">
         <div>
